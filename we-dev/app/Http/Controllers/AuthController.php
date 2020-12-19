@@ -79,15 +79,18 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
-        $token =  str_replace('Bearer ','',$request->header('Authorization'));
-        $this->jwt->setToken($token)->invalidate();
-        $this->jwt->setToken($token)->invalidate(true);
         Auth::logout();
+        $token = $this->jwt->getToken();
+
+        $this->jwt->setToken($token)->invalidate(true);
+        $this->jwt->invalidate();
+        $this->jwt->invalidate(true);
         $this->jwt->invalidate($this->jwt->getToken());
+        $this->jwt->invalidate($this->jwt->parseToken());
         $this->jwt->parseToken()->invalidate();
 
-        return ['message'=>'Token removed'] ;
+        return ['message'=>'token removed'] ;
     }
 }
