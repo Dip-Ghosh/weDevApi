@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\JWTAuth;
 
 class AuthController extends Controller
@@ -36,16 +37,17 @@ class AuthController extends Controller
 
         try {
 
-            $user = new User;
-            $user->name = $request->input('name');
-            $user->email = $request->input('email');
             $plainPassword = $request->input('password');
-            $user->password = app('hash')->make($plainPassword);
+            $data = [
+               'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'password' => app('hash')->make($plainPassword)
 
-            $user->save();
+            ];
+             DB::table('users')->insert($data);
 
             //return successful response
-            return response()->json(['user' => $user, 'message' => 'CREATED'], 201);
+            return response()->json(['user' => $data, 'message' => 'CREATED'], 200);
 
         } catch (\Exception $e) {
             //return error message
