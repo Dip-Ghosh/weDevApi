@@ -18,7 +18,7 @@ class ProductController extends Controller
     * email:dipghosh638@gmail.com
     * mobile:01744499902
     * Show the all product
-    * @return json response
+    * @return \Illuminate\Http\JsonResponse response
     */
 
     public function index(){
@@ -37,14 +37,15 @@ class ProductController extends Controller
      * mobile:01744499902
      * store data  in the products table
      * @param $request
-     * @return json response
+     * @return \Illuminate\Http\JsonResponse response
      */
 
     public function store(Request $request){
 
         $name = null;
         $this->validate($request, [
-            'title' => 'required|max:255'
+            'title' => 'required|max:255',
+            'image' => 'mimes:jpeg,jpg,png,gif|required|max:10000'
         ]);
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -75,12 +76,12 @@ class ProductController extends Controller
      * mobile:01744499902
      * Show the single Product in the List
      * @param $id
-     * @return json response
+     * @return \Illuminate\Http\JsonResponse response
      */
 
     public function show($id){
 
-        $product = DB::table('products')->where('id',$id)->get();
+        $product = DB::table('products')->where('id',$id)->first();
         return response()->json([
             'status'=>'success',
             'statusCode'=>200,
@@ -94,7 +95,7 @@ class ProductController extends Controller
      * mobile:01744499902
      * Show the update  in the List
      * @param  Request $request,$id
-     * @return json response
+     * @return \Illuminate\Http\JsonResponse response
      */
 
     public function update(Request $request,$id){
@@ -104,7 +105,7 @@ class ProductController extends Controller
             $name = time() . '.' . $image->getClientOriginalExtension();
             $destinationPath ='public/images/';
             $image->move($destinationPath, $name);
-           // $data['image'] = $name;
+
         }
 
         $data = [
@@ -113,7 +114,7 @@ class ProductController extends Controller
             'price'=>$request->price,
             'image'=>($request->hasFile('image'))?$name :$val->image
         ];
-      // dd($data);
+      
        DB::table('products')->where('id',$id)->update($data);
         return response()->json([
             'status'=>'success',
@@ -128,7 +129,7 @@ class ProductController extends Controller
      * mobile:01744499902
      * delete Product  From the List
      * @param  $id
-     * @return json response
+     * @return \Illuminate\Http\JsonResponse response
      */
 
     public function destroy($id){
